@@ -13,6 +13,7 @@
   "author": "Oliver Wee",
   "license": "MIT",
   "dependencies": {
-    "abci": "^5.0.1"
+    "abci": "^5.0.1",
+    "pino": "^6.0.0"
   }
 }
