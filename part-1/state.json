@@ -1,1 +1,5 @@
-{"chainData":{"lastBlockHeight":0}}
+{
+  "chainData": {
+    "lastBlockHeight": 5
+  }
+}

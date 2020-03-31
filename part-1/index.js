@@ -22,7 +22,7 @@ const State = () => {
   };
 
   const persist = () => {
-    fs.writeJsonSync('state.json', cache);
+    fs.writeJsonSync('state.json', cache, { spaces: 2 });
     return getAppHash();
   };
 
