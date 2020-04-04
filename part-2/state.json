@@ -1,5 +1,6 @@
 {
   "chainData": {
-    "lastBlockHeight": 5
-  }
+    "lastBlockHeight": 0
+  },
+  "todoList": []
 }

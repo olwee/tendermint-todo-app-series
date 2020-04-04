@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const pino = require('pino');
 const abciServer = require('abci');
 const stringify = require('json-stable-stringify');
+const TodoApp = require('./todo');
 
 const logger = pino();
 
@@ -11,6 +12,8 @@ const State = () => {
   const mempool = [];
   // Read from file
   const cache = fs.readJsonSync('state.json');
+
+  if (typeof cache.todoList === 'undefined') cache.todoList = [];
 
   const getAppHash = () => {
     if (cache.chainData.lastBlockHeight === 0) return '';
@@ -39,29 +42,44 @@ const State = () => {
 
 const state = State();
 
+const todoApp = TodoApp(state);
+
 const server = abciServer({
-  info: (request) => {
-    return {
-      data: 'Node.Js Todo-App',
-      version: '0.0.0',
-      appVersion: '0.0.0',
-      lastBlockHeight: state.cache.chainData.lastBlockHeight,
-      lastBlockAppHash: Buffer.from(state.getAppHash(), 'hex'),
-    };
-  }, 
+  info: () => ({
+    data: 'Node.Js Todo-App',
+    version: '0.0.0',
+    appVersion: '0.0.0',
+    lastBlockHeight: state.cache.chainData.lastBlockHeight,
+    lastBlockAppHash: Buffer.from(state.getAppHash(), 'hex'),
+  }),
   beginBlock: (request) => {
-    const { header: { height: rawHeight, appHash } } = request;
+    const { header: { height: rawHeight } } = request;
     const nextHeight = Number(rawHeight.toString());
     state.updateChainData('lastBlockHeight', nextHeight);
     return {};
   },
   checkTx: (request) => {
-    const { tx: txBytes } = request;  // Base64
+    const { tx: txBytes } = request; // Base64
+    try {
+      return todoApp.checkTx(txBytes);
+    } catch (err) {
+      console.log(err);
+      return { code: 1, log: 'ABCI App Err' };
+    }
   },
-  commit: (request) => {
+  deliverTx: (request) => {
+    const { tx: txBytes } = request; // Base64
+    try {
+      return todoApp.deliverTx(txBytes);
+    } catch (err) {
+      console.log(err);
+      return { code: 1, log: 'ABCI App Err' };
+    }
+  },
+  commit: () => {
     // Here we persist the state to disk
     const appHash = state.persist();
-    logger.info(`Commited Height: ${state.cache.chainData.lastBlockHeight} AppHash: ${appHash}`); 
+    logger.info(`Commited Height: ${state.cache.chainData.lastBlockHeight} AppHash: ${appHash}`);
     return {
       data: Buffer.from(appHash, 'hex'),
     };
