@@ -8,26 +8,21 @@
   },
   "keywords": [
     "tendermint",
-    "todo-app"
+    "abci"
   ],
   "author": "Oliver Wee",
   "license": "MIT",
   "dependencies": {
-    "abci": "^5.0.1",
     "axios": "^0.19.2",
     "fs-extra": "^9.0.0",
-    "google-protobuf": "^3.11.4",
-    "grpc": "^1.24.2",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-ts": "^6.0.0-beta.22",
     "json-stable-stringify": "^1.0.1",
-    "msgpack": "^1.0.3",
     "pino": "^6.0.0",
-    "protocol-buffers-encodings": "^1.1.0",
     "yargs": "^15.3.1"
   },
   "devDependencies": {
-    "@types/node": "^13.11.0",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
     "chai": "^4.2.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^18.0.1",
@@ -36,7 +31,10 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.16.0",
     "google-proto-files": "^2.0.0",
+    "google-protobuf": "^3.11.4",
     "grunt": "^1.1.0",
-    "typescript": "^3.8.3"
+    "grunt-babel": "^8.0.0",
+    "grunt-contrib-watch": "^1.1.0",
+    "protocol-buffers-encodings": "^1.1.0"
   }
 }
