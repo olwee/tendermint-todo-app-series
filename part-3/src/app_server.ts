@@ -29,14 +29,11 @@ const ABCIConnection = (c: net.Socket) => {
   };
 
   const readNextMsg = (prefixLen: number, msgLen: number) => {
-    console.log('recvBuf');
-    console.log(recvBuf);
     const msgBuf: Buffer = Buffer.alloc(msgLen);
     recvBuf.copy(msgBuf, 0, prefixLen, msgLen + prefixLen);
     const msgRaw = Request.deserializeBinary(msgBuf).toObject();
     const msgType:string = Object.keys(msgRaw).find((msgName) => typeof msgRaw[msgName] !== 'undefined');
     const msgVal: any = msgRaw[msgType];
-    console.log(msgVal);
     if (msgType === 'echo') {
       // Echo back the message
       const { message: recvMsg } = msgVal;
@@ -75,9 +72,9 @@ const ABCIConnection = (c: net.Socket) => {
 };
 
 
-const server: any = net.createServer(ABCIConnection);
+const server: net.Server = net.createServer(ABCIConnection);
 
-const portNum = 26658;
+const portNum: number = 26658;
 
 server.listen(portNum, () => {
   logger.info(`Listening on ${portNum}`);

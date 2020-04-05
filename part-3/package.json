@@ -18,6 +18,7 @@
     "fs-extra": "^9.0.0",
     "google-protobuf": "^3.11.4",
     "grpc": "^1.24.2",
+    "grunt-contrib-watch": "^1.1.0",
     "grunt-ts": "^6.0.0-beta.22",
     "json-stable-stringify": "^1.0.1",
     "msgpack": "^1.0.3",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^13.11.0",
+    "chai": "^4.2.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-airbnb-base": "^13.1.0",
