@@ -4,12 +4,12 @@ import { encode, decode } from '../../abci/msg_request';
 describe('# ABCI Request Messages', () => {
   describe('# echo Message', () => {
     it('should encode an echo message', () => {
-      const encoded = encode({ msgType: 'echo', msgVal: { message: 'hi', } });
-      assert.equal(encoded.toString('hex'),'0c12040a026869');
+      const encoded = encode({ msgType: 'echo', msgVal: { message: 'hi' } });
+      assert.equal(encoded.toString('hex'), '0c12040a026869');
     });
     it('should encode an echo message w/o wrapReq', () => {
-      const encoded = encode({ msgType: 'echo', msgVal: { message: 'hi', } }, false);
-      assert.equal(encoded.toString('hex'),'0a026869');
+      const encoded = encode({ msgType: 'echo', msgVal: { message: 'hi' } }, false);
+      assert.equal(encoded.toString('hex'), '0a026869');
     });
     it('should decode an echo message', () => {
       const decoded = decode(Buffer.from('0c12040a026869', 'hex'));
