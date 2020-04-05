@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "grunt pre-test",
+    "test": "npm run build && nyc mocha build/test/**/*.js --exit --reporter=list"
   },
   "keywords": [
     "tendermint",
