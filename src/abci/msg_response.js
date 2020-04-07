@@ -4,6 +4,8 @@ import {
   Response,
   ResponseEcho,
   ResponseFlush,
+  ResponseInfo,
+  ResponseCommit,
 } from '../../gen/types_pb';
 
 const encodePadding = (abciResp) => {
@@ -24,6 +26,8 @@ const wrapResponse = (msgType, abciMsg) => {
   const abciResp = new Response();
   if (msgType === 'echo') abciResp.setEcho(abciMsg);
   if (msgType === 'flush') abciResp.setFlush(abciMsg);
+  if (msgType === 'info') abciResp.setInfo(abciMsg);
+  if (msgType === 'commit') abciResp.setCommit(abciMsg);
   return encodePadding(abciResp);
 };
 
@@ -54,13 +58,59 @@ RespFlush.encode = (msgVal = {}, wrapResp = true) => {
   return wrapResponse('flush', flushResp);
 };
 
+const RespInfo = {};
+
+RespInfo.encode = (msgVal = {}, wrapResp = true) => {
+  const infoResp = new ResponseInfo();
+  const {
+    data,
+    version,
+    appVersion,
+    lastBlockHeight,
+    lastBlockAppHash,
+  } = msgVal;
+  if (typeof data !== 'undefined') infoResp.setData(data);
+  if (typeof version !== 'undefined') infoResp.setVersion(version);
+  if (typeof appVersion !== 'undefined') infoResp.setAppVersion(appVersion);
+  if (typeof lastBlockHeight !== 'undefined') infoResp.setLastBlockHeight(lastBlockHeight);
+  if (typeof lastBlockAppHash !== 'undefined') infoResp.setLastBlockAppHash(lastBlockAppHash);
+
+  if (wrapResp === false) return infoResp;
+  return wrapResponse('info', infoResp);
+};
+
+const RespCommit = {};
+
+RespCommit.encode = (msgVal = {}, wrapResp = true) => {
+  const commitResp = new ResponseCommit();
+  const {
+    data,
+  } = msgVal;
+  if (typeof data !== 'undefined') commitResp.setData(data);
+
+  if (wrapResp === false) return commitResp;
+  return wrapResponse('commit', commitResp);
+};
+
 const msgMap = {
   echo: RespEcho,
   flush: RespFlush,
+  info: RespInfo,
+  commit: RespCommit,
 };
 
 const caseMap = {
   2: 'echo',
+  3: 'flush',
+  4: 'info',
+  5: 'setOption',
+  6: 'initChain',
+  7: 'query',
+  8: 'beginBlock',
+  9: 'checkTx',
+  19: 'deliverTx',
+  11: 'endBlock',
+  12: 'commit',
 };
 
 const encode = ({
