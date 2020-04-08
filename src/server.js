@@ -67,11 +67,7 @@ const ABCIConnection = (msgHandler) => (c) => {
     }
     try {
       const handlerResp = await msgHandler.route(msgType, msgVal);
-      console.log('---handlerResp---');
-      console.log(handlerResp);
       const respBuf = respEncode({ msgType, msgVal: handlerResp });
-      console.log('---respBuf---');
-      console.log(respBuf);
       writeData(respBuf);
       isWaiting = false;
       c.resume();
@@ -99,37 +95,17 @@ const ABCIConnection = (msgHandler) => (c) => {
   };
 };
 
-const app = ABCIHandler({
-  // Can be {}
-  info: async (req) => {
-    return {
-      data: 'NodeJS ABCI App',
-      appVersion: '1',
-      lastBlockHeight: 0,
-      lastBlockAppHash: Buffer.from(''),
-    };
-  },
-  commit: async (req) => {
-    return {
-      data: Buffer.from('1234', 'hex'),
-    };
-  },
-  checkTx: async (req) => {
-    console.log(req);
-    return {};
-  },
-  deliverTx: async (req) => {
-    console.log(req);
-    return {};
-  },
-});
+const ABCIServer = (appHandler) => {
+  const app = ABCIHandler(appHandler);
+  const connector = ABCIConnection(app);
 
-const connector = ABCIConnection(app);
+  const server = net.createServer(connector);
 
-const server = net.createServer(connector);
+  const portNum = process.env.ABCI_PORT || 26658;
 
-const portNum = 26658;
+  server.listen(portNum, () => {
+    logger.info(`Listening on port ${portNum}`);
+  });
+};
 
-server.listen(portNum, () => {
-  logger.info(`Listening on port ${portNum}`);
-});
+export default ABCIServer;
