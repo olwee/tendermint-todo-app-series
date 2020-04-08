@@ -114,6 +114,14 @@ const app = ABCIHandler({
       data: Buffer.from('1234', 'hex'),
     };
   },
+  checkTx: async (req) => {
+    console.log(req);
+    return {};
+  },
+  deliverTx: async (req) => {
+    console.log(req);
+    return {};
+  },
 });
 
 const connector = ABCIConnection(app);
