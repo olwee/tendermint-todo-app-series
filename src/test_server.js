@@ -109,6 +109,11 @@ const app = ABCIHandler({
       lastBlockAppHash: Buffer.from(''),
     };
   },
+  commit: async (req) => {
+    return {
+      data: Buffer.from('1234', 'hex'),
+    };
+  },
 });
 
 const connector = ABCIConnection(app);

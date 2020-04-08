@@ -72,10 +72,35 @@ ReqInfo.decodeReq = (abciReq) => {
   return { msgType: 'info', msgVal: msgObj.toObject() };
 };
 
+const ReqCommit = {};
+
+ReqCommit.decodeReq = (abciReq) => {
+  const msgObj = abciReq.getCommit();
+  return { msgType: 'commit', msgVal: msgObj.toObject() };
+};
+
+const ReqCheckTx = {};
+
+ReqCheckTx.decodeReq = (abciReq) => {
+  const msgObj = abciReq.getCheckTx();
+  return { msgType: 'checkTx', msgVal: msgObj.toObject() };
+};
+
+const ReqDeliverTx = {};
+
+ReqDeliverTx.decodeReq = (abciReq) => {
+  const msgObj = abciReq.getDeliverTx();
+  return { msgType: 'deliverTx', msgVal: msgObj.toObject() };
+};
+
+
 const msgMap = {
   echo: ReqEcho,
   flush: ReqFlush,
   info: ReqInfo,
+  commit: ReqCommit,
+  checkTx: ReqCheckTx,
+  deliverTx: ReqDeliverTx,
 };
 
 const caseMap = {

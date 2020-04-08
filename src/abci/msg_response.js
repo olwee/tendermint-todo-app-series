@@ -6,6 +6,8 @@ import {
   ResponseFlush,
   ResponseInfo,
   ResponseCommit,
+  ResponseCheckTx,
+  ResponseDeliverTx,
 } from '../../gen/types_pb';
 
 const encodePadding = (abciResp) => {
@@ -28,6 +30,8 @@ const wrapResponse = (msgType, abciMsg) => {
   if (msgType === 'flush') abciResp.setFlush(abciMsg);
   if (msgType === 'info') abciResp.setInfo(abciMsg);
   if (msgType === 'commit') abciResp.setCommit(abciMsg);
+  if (msgType === 'checkTx') abciResp.setCheckTx(abciMsg);
+  if (msgType === 'deliverTx') abciResp.setDeliverTx(abciMsg);
   return encodePadding(abciResp);
 };
 
@@ -92,11 +96,67 @@ RespCommit.encode = (msgVal = {}, wrapResp = true) => {
   return wrapResponse('commit', commitResp);
 };
 
+const RespCheckTx = {};
+
+RespCheckTx.encode = (msgVal = {}, wrapResp = true) => {
+  const checkTxResp = new ResponseCheckTx();
+  const {
+    code,
+    data,
+    log,
+    info,
+    gasWanted,
+    gasUsed,
+    events,
+    codespace,
+  } = msgVal;
+  if (typeof code !== 'undefined') checkTxResp.setCode(code);
+  if (typeof data !== 'undefined') checkTxResp.setData(data);
+  if (typeof log !== 'undefined') checkTxResp.setLog(log);
+  if (typeof info !== 'undefined') checkTxResp.setInfo(info);
+  if (typeof gasWanted !== 'undefined') checkTxResp.setGasWanted(gasWanted);
+  if (typeof gasUsed !== 'undefined') checkTxResp.setGasWanted(gasUsed);
+  if (typeof events !== 'undefined') checkTxResp.setEvents(events);
+  if (typeof codespace !== 'undefined') checkTxResp.setCodespace(codespace);
+
+  if (wrapResp === false) return checkTxResp;
+  return wrapResponse('checkTx', checkTxResp);
+};
+
+const RespDeliverTx = {};
+
+RespDeliverTx.encode = (msgVal = {}, wrapResp = true) => {
+  const deliverTxResp = new ResponseDeliverTx();
+  const {
+    code,
+    data,
+    log,
+    info,
+    gasWanted,
+    gasUsed,
+    events,
+    codespace,
+  } = msgVal;
+  if (typeof code !== 'undefined') deliverTxResp.setCode(code);
+  if (typeof data !== 'undefined') deliverTxResp.setData(data);
+  if (typeof log !== 'undefined') deliverTxResp.setLog(log);
+  if (typeof info !== 'undefined') deliverTxResp.setInfo(info);
+  if (typeof gasWanted !== 'undefined') deliverTxResp.setGasWanted(gasWanted);
+  if (typeof gasUsed !== 'undefined') deliverTxResp.setGasWanted(gasUsed);
+  if (typeof events !== 'undefined') deliverTxResp.setEvents(events);
+  if (typeof codespace !== 'undefined') deliverTxResp.setCodespace(codespace);
+
+  if (wrapResp === false) return deliverTxResp;
+  return wrapResponse('deliverTx', deliverTxResp);
+};
+
 const msgMap = {
   echo: RespEcho,
   flush: RespFlush,
   info: RespInfo,
   commit: RespCommit,
+  checkTx: RespCheckTx,
+  deliverTx: RespDeliverTx,
 };
 
 const caseMap = {
