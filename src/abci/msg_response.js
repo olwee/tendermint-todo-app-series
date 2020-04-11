@@ -11,6 +11,7 @@ import {
   ResponseBeginBlock,
   ResponseInitChain,
   ResponseEndBlock,
+  ResponseQuery,
 } from '../../gen/types_pb';
 
 const encodePadding = (abciResp) => {
@@ -38,6 +39,7 @@ const wrapResponse = (msgType, abciMsg) => {
   if (msgType === 'beginBlock') abciResp.setBeginBlock(abciMsg);
   if (msgType === 'initChain') abciResp.setInitChain(abciMsg);
   if (msgType === 'endBlock') abciResp.setEndBlock(abciMsg);
+  if (msgType === 'query') abciResp.setQuery(abciMsg);
   return encodePadding(abciResp);
 };
 
@@ -201,6 +203,35 @@ RespEndBlock.encode = (msgVal = {}, wrapResp = true) => {
   return wrapResponse('initChain', endBlockResp);
 };
 
+const RespQuery = {};
+
+RespQuery.encode = (msgVal = {}, wrapResp = true) => {
+  const queryResp = new ResponseQuery();
+  const {
+    code,
+    log,
+    info,
+    index,
+    key,
+    value,
+    proof,
+    height,
+    codespace,
+  } = msgVal;
+  if (typeof code !== 'undefined') queryResp.setCode(code);
+  if (typeof log !== 'undefined') queryResp.setLog(log);
+  if (typeof info !== 'undefined') queryResp.setInfo(info);
+  if (typeof index !== 'undefined') queryResp.setIndex(index);
+  if (typeof key !== 'undefined') queryResp.setKey(key);
+  if (typeof value !== 'undefined') queryResp.setValue(value);
+  if (typeof proof !== 'undefined') queryResp.setProof(proof);
+  if (typeof height !== 'undefined') queryResp.setHeight(height);
+  if (typeof codespace !== 'undefined') queryResp.setCodespace(codespace);
+
+  if (wrapResp === false) return queryResp;
+  return wrapResponse('query', queryResp);
+};
+
 const msgMap = {
   echo: RespEcho,
   flush: RespFlush,
@@ -211,6 +242,7 @@ const msgMap = {
   beginBlock: RespBeginBlock,
   initChain: RespInitChain,
   endBlock: RespEndBlock,
+  query: RespQuery,
 };
 
 const caseMap = {

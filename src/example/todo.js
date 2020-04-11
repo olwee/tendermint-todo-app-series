@@ -87,19 +87,25 @@ const TodoApp = (state) => {
   const broadcastTx = async (msgType, msgVal) => {
     const stdTx = todoSwitch[msgType].create(msgVal);
     const txQuery = `0x${stdTx.toString('hex')}`;
-    const queryURL = `http://127.0.0.1:26657/broadcast_tx_async?tx=${txQuery}`;
+    const queryURL = `http://127.0.0.1:26657/broadcast_tx_commit?tx=${txQuery}`;
     console.log(queryURL);
     const broadcastResp = await axios({
       headers: { accept: 'application.json' },
       method: 'get',
       url: queryURL,
     });
-    console.log(broadcastResp.toJSON());
+    console.log(JSON.stringify(broadcastResp.data, null, 2));
+  };
+
+  const query = (req) => {
+    console.log(req);
+    return {};
   };
 
   return {
     checkTx,
     deliverTx,
+    query,
     broadcastTx,
   };
 };

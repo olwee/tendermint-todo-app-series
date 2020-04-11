@@ -86,6 +86,7 @@ const server = abciServer({
       data: Buffer.from(appHash, 'hex'),
     };
   },
+  query: (req) => todoApp.query(req),
 });
 
 server.listen(26658);

@@ -1,6 +1,7 @@
 import net from 'net';
 import pino from 'pino';
 import BL from 'bl';
+import { v4 as uuidv4 } from 'uuid';
 import { decode as reqDecode, decodePadding } from './abci/msg_request';
 import { encode as respEncode } from './abci/msg_response';
 
@@ -23,6 +24,7 @@ const ABCIHandler = (handlers) => {
 };
 
 const ABCIConnection = (msgHandler) => (c) => {
+  const connId = uuidv4();
   const recvBuf = new BL();
   let isWaiting = false;
 
@@ -33,23 +35,18 @@ const ABCIConnection = (msgHandler) => (c) => {
   };
 
   const processRecvData = async () => {
-    console.log('recvBuf');
-    console.log(recvBuf.toString('hex'));
     const { msgLen, msgLenRead } = decodePadding(recvBuf);
-    console.log(msgLen, msgLenRead);
     const totalLen = msgLen + msgLenRead;
     if (recvBuf.length < totalLen) return; // Buffering
     const msgBytes = recvBuf.slice(msgLenRead, totalLen);
-    console.log('msgBytes');
-    console.log(msgBytes);
     recvBuf.consume(totalLen);
     const {
       msgType,
       msgVal,
     } = reqDecode(msgBytes, false);
-    logger.info({ msgType });
 
-    logger.info({ msgType, msgVal });
+    logger.info({ connId, mode: 'request', msgType });
+    // logger.info({ msgType, msgVal });
 
     c.pause();
     isWaiting = true;
@@ -58,41 +55,64 @@ const ABCIConnection = (msgHandler) => (c) => {
       // Echo back the message
       const respBuf = respEncode({ msgType: 'echo', msgVal: { message: msgVal.message } });
       writeData(respBuf);
-      isWaiting = false;
-      c.resume();
+      c.emit('evt-done');
       return;
     }
 
     if (msgType === 'flush') {
       // Reply Flush
       const respBuf = respEncode({ msgType: 'flush', msgVal: {} });
+      logger.info({ connId, mode: 'response', msgType: 'flush' });
       writeData(respBuf);
-      isWaiting = false;
-      c.resume();
+      c.emit('evt-done');
       return;
     }
     try {
       const handlerResp = await msgHandler.route(msgType, msgVal);
+      logger.info({
+        connId,
+        mode: 'response',
+        msgType,
+        writing: true,
+      });
       const respBuf = respEncode({ msgType, msgVal: handlerResp });
       writeData(respBuf);
-      isWaiting = false;
-      c.resume();
-
-      if (recvBuf.length > 0) {
-        processRecvData();
-      }
+      logger.info({
+        connId,
+        mode: 'response',
+        msgType,
+        writing: false,
+      });
+      c.emit('evt-done');
     } catch (handlerErr) {
-      c.emit('error', handlerErr);
+      if (handlerErr) {
+        c.emit('error', handlerErr);
+      }
     }
   };
 
+  c.on('evt-done', () => {
+    if (recvBuf.length > 0) {
+      processRecvData();
+      return;
+    }
+    isWaiting = false;
+    c.resume();
+  });
 
   c.on('data', (rawData) => {
+    logger.info({
+      evt: 'onData',
+      rawData: rawData.toString('hex'),
+      isWaiting,
+    });
     recvBuf.append(rawData);
     if (isWaiting === true) return;
     processRecvData()
       .catch((procErr) => {
-        if (procErr) c.emit('error', procErr);
+        if (procErr) {
+          c.emit('error', procErr);
+        }
       });
   });
 

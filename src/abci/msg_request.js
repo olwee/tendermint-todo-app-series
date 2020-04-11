@@ -114,17 +114,24 @@ ReqEndBlock.decodeReq = (abciReq) => {
   return { msgType: 'endBlock', msgVal: msgObj.toObject() };
 };
 
+const ReqQuery = {};
+
+ReqQuery.decodeReq = (abciReq) => {
+  const msgObj = abciReq.getQuery();
+  return { msgType: 'query', msgVal: msgObj.toObject() };
+};
 
 const msgMap = {
   echo: ReqEcho,
   flush: ReqFlush,
   info: ReqInfo,
-  commit: ReqCommit,
+  initChain: ReqInitChain,
+  query: ReqQuery,
+  beginBlock: ReqBeginBlock,
   checkTx: ReqCheckTx,
   deliverTx: ReqDeliverTx,
-  beginBlock: ReqBeginBlock,
-  initChain: ReqInitChain,
   endBlock: ReqEndBlock,
+  commit: ReqCommit,
 };
 
 const caseMap = {
@@ -163,7 +170,6 @@ const decode = (rawBytes, hasPadding = true) => {
   }
   const abciReq = Request.deserializeBinary(msgBytes);
   const msgEnum = caseMap[abciReq.getValueCase()];
-  console.log(`msgEnum: ${msgEnum}`);
   return msgMap[msgEnum].decodeReq(abciReq, false);
 };
 
