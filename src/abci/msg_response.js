@@ -8,6 +8,9 @@ import {
   ResponseCommit,
   ResponseCheckTx,
   ResponseDeliverTx,
+  ResponseBeginBlock,
+  ResponseInitChain,
+  ResponseEndBlock,
 } from '../../gen/types_pb';
 
 const encodePadding = (abciResp) => {
@@ -32,6 +35,9 @@ const wrapResponse = (msgType, abciMsg) => {
   if (msgType === 'commit') abciResp.setCommit(abciMsg);
   if (msgType === 'checkTx') abciResp.setCheckTx(abciMsg);
   if (msgType === 'deliverTx') abciResp.setDeliverTx(abciMsg);
+  if (msgType === 'beginBlock') abciResp.setBeginBlock(abciMsg);
+  if (msgType === 'initChain') abciResp.setInitChain(abciMsg);
+  if (msgType === 'endBlock') abciResp.setEndBlock(abciMsg);
   return encodePadding(abciResp);
 };
 
@@ -150,6 +156,51 @@ RespDeliverTx.encode = (msgVal = {}, wrapResp = true) => {
   return wrapResponse('deliverTx', deliverTxResp);
 };
 
+const RespBeginBlock = {};
+
+RespBeginBlock.encode = (msgVal = {}, wrapResp = true) => {
+  const beginBlockResp = new ResponseBeginBlock();
+  const {
+    events,
+  } = msgVal;
+  if (typeof events !== 'undefined') beginBlockResp.setEvents(events);
+
+  if (wrapResp === false) return beginBlockResp;
+  return wrapResponse('beginBlock', beginBlockResp);
+};
+
+const RespInitChain = {};
+
+RespInitChain.encode = (msgVal = {}, wrapResp = true) => {
+  const initChainResp = new ResponseInitChain();
+  const {
+    consensusParams,
+    validators,
+  } = msgVal;
+  if (typeof consensusParams !== 'undefined') initChainResp.setConsensusParams(consensusParams);
+  if (typeof validators !== 'undefined') initChainResp.setValidators(validators);
+
+  if (wrapResp === false) return initChainResp;
+  return wrapResponse('initChain', initChainResp);
+};
+
+const RespEndBlock = {};
+
+RespEndBlock.encode = (msgVal = {}, wrapResp = true) => {
+  const endBlockResp = new ResponseEndBlock();
+  const {
+    consensusParams,
+    validators,
+    events,
+  } = msgVal;
+  if (typeof consensusParams !== 'undefined') endBlockResp.setConsensusParams(consensusParams);
+  if (typeof validators !== 'undefined') endBlockResp.setValidators(validators);
+  if (typeof events !== 'undefined') endBlockResp.setEvents(events);
+
+  if (wrapResp === false) return endBlockResp;
+  return wrapResponse('initChain', endBlockResp);
+};
+
 const msgMap = {
   echo: RespEcho,
   flush: RespFlush,
@@ -157,6 +208,9 @@ const msgMap = {
   commit: RespCommit,
   checkTx: RespCheckTx,
   deliverTx: RespDeliverTx,
+  beginBlock: RespBeginBlock,
+  initChain: RespInitChain,
+  endBlock: RespEndBlock,
 };
 
 const caseMap = {

@@ -37,6 +37,7 @@
     "grunt": "^1.1.0",
     "grunt-babel": "^8.0.0",
     "grunt-contrib-watch": "^1.1.0",
+    "msgpack": "^1.0.3",
     "protocol-buffers-encodings": "^1.1.0"
   }
 }

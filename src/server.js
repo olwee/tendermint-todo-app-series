@@ -33,15 +33,21 @@ const ABCIConnection = (msgHandler) => (c) => {
   };
 
   const processRecvData = async () => {
+    console.log('recvBuf');
+    console.log(recvBuf.toString('hex'));
     const { msgLen, msgLenRead } = decodePadding(recvBuf);
+    console.log(msgLen, msgLenRead);
     const totalLen = msgLen + msgLenRead;
     if (recvBuf.length < totalLen) return; // Buffering
     const msgBytes = recvBuf.slice(msgLenRead, totalLen);
+    console.log('msgBytes');
+    console.log(msgBytes);
     recvBuf.consume(totalLen);
     const {
       msgType,
       msgVal,
     } = reqDecode(msgBytes, false);
+    logger.info({ msgType });
 
     logger.info({ msgType, msgVal });
 
@@ -101,11 +107,7 @@ const ABCIServer = (appHandler) => {
 
   const server = net.createServer(connector);
 
-  const portNum = process.env.ABCI_PORT || 26658;
-
-  server.listen(portNum, () => {
-    logger.info(`Listening on port ${portNum}`);
-  });
+  return server;
 };
 
 export default ABCIServer;
