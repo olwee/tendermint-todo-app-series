@@ -13,12 +13,12 @@ const State = () => {
   // Read from file
   const cache = fs.readJsonSync('state.json');
 
-  if (typeof cache.todoList === 'undefined') cache.todoList = [];
+  if (typeof cache.appData.todoList === 'undefined') cache.appData.todoList = [];
 
   const getAppHash = () => {
     if (cache.chainData.lastBlockHeight === 0) return '';
     const hash = crypto.createHash('sha256');
-    hash.update(stringify(cache));
+    hash.update(stringify(cache.appData));
     return hash.digest('hex');
   };
 

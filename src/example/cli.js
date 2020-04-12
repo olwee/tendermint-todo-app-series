@@ -1,7 +1,7 @@
 const yargs = require('yargs');
 const TodoApp = require('./todo');
 
-const todoApp = TodoApp({});
+const todoApp = TodoApp({ cache: { appData: { todoList: [] } } });
 
 yargs
   .command('add-todo [todo]', 'Create a new Todo', (args) => {
@@ -11,7 +11,32 @@ yargs
   }, (argv) => {
     const { todo } = argv;
     todoApp
-      .broadcastTx('todo/add', todo)
+      .broadcastTx('add', todo)
+      .then(() => {
+        //
+      })
+      .catch((err) => {
+        if (err) console.log(err);
+      });
+  })
+  .command('list', 'List all Todo(s)', (args) => {
+    args
+      .options('height', {
+        demandOption: false,
+      })
+      .options('data', {
+        alias: 'd',
+        demandOption: false,
+      })
+      .options('path', {
+        alias: 'p',
+        demandOption: false,
+      });
+  },
+  (argv) => {
+    const { path, height, data } = argv;
+    todoApp
+      .queryCLI({ path, height, data })
       .then(() => {
         //
       })
