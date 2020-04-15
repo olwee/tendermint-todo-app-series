@@ -1,7 +1,8 @@
 const crypto = require('crypto');
 const fs = require('fs-extra');
 const pino = require('pino');
-const abciServer = require('abci');
+const abciUtils = require('abci-utils');
+
 const stringify = require('json-stable-stringify');
 const TodoApp = require('./todo');
 
@@ -44,7 +45,7 @@ const state = State();
 
 const todoApp = TodoApp(state);
 
-const server = abciServer({
+const server = abciUtils.Server({
   info: () => ({
     data: 'Node.Js Todo-App',
     version: '0.0.0',
