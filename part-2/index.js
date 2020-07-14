@@ -49,7 +49,7 @@ const server = abciUtils.Server({
   info: () => ({
     data: 'Node.Js Todo-App',
     version: '0.0.0',
-    appVersion: '0.0.0',
+    appVersion: 0,
     lastBlockHeight: state.cache.chainData.lastBlockHeight,
     lastBlockAppHash: Buffer.from(state.getAppHash(), 'hex'),
   }),

@@ -8,7 +8,9 @@ const encodeTx = (tx) => msgpack.pack(tx);
 
 const decodeTx = (txBytes) => {
   try {
-    const txObj = msgpack.unpack(Buffer.from(txBytes.toString('hex'), 'hex'));
+    const txObj = msgpack.unpack(Buffer.from(txBytes.toString(), 'base64'));
+    console.log('decoded Tx');
+    console.log(txObj);
     return txObj;
   } catch (err) {
     console.log(err);
@@ -40,6 +42,8 @@ const add = (state) => ({
 
 
 const unpackTx = (txSwitch) => (txOp) => (txObj) => {
+  console.log('txObj');
+  console.log(txObj);
   const { type: txType, value: txVal } = txObj;
   if (!isDef(txType) || !isDef(txType)) return { code: 1, log: 'Fail to unpack tx contents' };
   if (txType === 'todo/StdTx') {
@@ -81,20 +85,22 @@ const TodoApp = (state) => {
     // Remove from mempool
     const txObj = decodeTx(txBytes);
     if (txObj === null) return { code: 1, log: 'Fail to unpack tx with msgpack' };
+    console.log('deliverTx');
+    console.log(txObj);
     return unpackTx(todoSwitch)('deliver')(txObj);
   };
 
   const broadcastTx = async (msgType, msgVal) => {
     const stdTx = todoSwitch[msgType].create(msgVal);
     const txQuery = `0x${stdTx.toString('hex')}`;
-    const queryURL = `http://127.0.0.1:26658/broadcast_tx_async?tx=${txQuery}`;
+    const queryURL = `http://127.0.0.1:26657/broadcast_tx_async?tx=${txQuery}`;
     console.log(queryURL);
     const broadcastResp = await axios({
       headers: { accept: 'application.json' },
       method: 'get',
       url: queryURL,
     });
-    console.log(broadcastResp.toJSON());
+    console.log(broadcastResp);
   };
 
   return {
